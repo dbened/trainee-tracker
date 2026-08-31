@@ -1,0 +1,196 @@
+@model Softwareproject.Models.Trainee
+
+@{
+    Layout = null;
+    var lessonPlans = ViewBag.LessonPlans as IEnumerable<Softwareproject.Models.LessonPlan>;
+    var mentors = ViewBag.Mentors as IEnumerable<Softwareproject.Models.Mentor>;
+
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="~/css/adminCreate.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <p></p>
+
+    <form asp-action="TraineeEdit" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EmailAddress"></label>
+            <input asp-for="EmailAddress" class="form-input" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartDate"></label>
+            <input asp-for="StartDate" type="date" class="form-input" />
+            <span asp-validation-for="StartDate" class="validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndDate"></label>
+            <input asp-for="EndDate" type="date" class="form-input" />
+            <span asp-validation-for="EndDate" class="validation-error"></span>
+        </div>
+        <div class="form-group">
+            <label>
+                <input asp-for="IsActive" />
+                Aktiv
+            </label>
+        </div>
+
+        <button type="submit" class="btn primary">
+            Speichern
+        </button>
+
+    </form>
+
+    <hr style="margin:40px 0;" />
+
+    <h2>Lehrplan</h2>
+
+    @if (Model.LessonPlan == null)
+    {
+        <form asp-action="AssignLessonPlan" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="traineeId" value="@Model.Id" />
+
+            <div class="form-group">
+
+                <select name="lessonPlanId" class="form-input">
+
+                    <option value="">Lehrplan auswählen</option>
+
+                    @foreach (var plan in lessonPlans!)
+                    {
+                        <option value="@plan.Id">@plan.Description</option>
+                    }
+
+                </select>
+
+            </div>
+
+            <button type="submit" class="btn primary">
+                Lehrplan zuweisen
+            </button>
+
+        </form>
+    }
+    else
+    {
+        <form asp-action="RemoveLessonPlan" method="post"
+              onsubmit="return confirm('⚠️ Lehrplan wirklich entfernen?\n\nAlle Fortschritte des Trainees gehen dabei verloren.');">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="traineeId" value="@Model.Id" />
+
+            <button type="submit" class="btn danger">
+                Lehrplan entfernen
+            </button>
+
+        </form>
+    }
+
+    <hr style="margin:40px 0;" />
+
+    <h2>Mentoren</h2>
+
+    <form asp-controller="Admin" asp-action="AssignMentor" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="traineeId" value="@Model.Id" />
+
+        <div class="form-group">
+
+            <select name="mentorId" class="form-input">
+
+                <option value="">Mentor auswählen</option>
+
+                @foreach (var mentor in mentors!)
+                {
+                    <option value="@mentor.Id">@mentor.Name</option>
+                }
+
+            </select>
+
+        </div>
+
+        <button type="submit" class="btn primary">
+            Mentor zuweisen
+        </button>
+
+    </form>
+
+    <p></p>
+
+    <!-- Mentor entfernen -->
+    <form asp-controller="Admin" asp-action="RemoveMentor" method="post"
+          onsubmit="return confirm('⚠️ Mentor wirklich von diesem Trainee entfernen?');">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="traineeId" value="@Model.Id" />
+
+        <div class="form-group">
+
+            <select name="mentorId" class="form-input" required>
+
+                <option value="">Mentor entfernen</option>
+
+                @if (Model.MentorList != null && Model.MentorList.Any())
+                {
+                    @foreach (var mentor in Model.MentorList)
+                    {
+                        <option value="@mentor.Id">@mentor.Name</option>
+                    }
+                }
+
+            </select>
+
+        </div>
+
+        <button type="submit" class="btn danger">
+            Mentor entfernen
+        </button>
+
+    </form>
+
+</body>
+
+</html>

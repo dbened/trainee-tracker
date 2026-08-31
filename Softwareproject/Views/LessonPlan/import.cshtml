@@ -1,0 +1,85 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lehrplan importieren</title>
+    <link rel="stylesheet" href="~/css/lehrplan.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <h1>Lehrplan importieren</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div
+            style="background:#e6faf0; border:1px solid #a3e6c0; border-radius:10px; padding:12px 18px; margin-bottom:1.5rem; color:#1a6b3c; font-weight:600;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div
+            style="background:#fff0f3; border:1px solid #ffb3c1; border-radius:10px; padding:12px 18px; margin-bottom:1.5rem; color:#b10030; font-weight:600;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @{
+        var existingPlans = (ViewBag.Plans as IEnumerable<Softwareproject.Models.LessonPlan>) ?? Enumerable.Empty<Softwareproject.Models.LessonPlan>();
+    }
+
+    <div class="plan-card" style="max-width:480px;">
+        <div class="plan-title">JSON-Import</div>
+        <p style="color:#626262; margin-bottom:1.2rem; font-size:0.95rem;">
+            JSON-Datei hochladen, um einen neuen Lehrplan anzulegen oder einen bestehenden zu aktualisieren.
+            Bei einer Aktualisierung bleiben bestehende Bearbeitungszustände erhalten.
+        </p>
+
+        <form asp-controller="LessonPlan" asp-action="ImportLessonPlan" method="post" enctype="multipart/form-data">
+            <select name="planId" id="planId" onchange="document.getElementById('newPlanNameRow').style.display = this.value === '' ? 'block' : 'none';"
+                    style="width:100%; padding:10px 12px; border:1px solid #dbdbdb; border-radius:10px; margin-bottom:14px; box-sizing:border-box; font-size:14px;">
+                <option value="">Neuen Lehrplan anlegen</option>
+                @foreach (var existingPlan in existingPlans)
+                {
+                    <option value="@existingPlan.Id">@(string.IsNullOrEmpty(existingPlan.Description) ? $"Lehrplan #{existingPlan.Id}" : existingPlan.Description) aktualisieren</option>
+                }
+            </select>
+
+            <div id="newPlanNameRow">
+                <input type="text" name="PlanName" placeholder="Name des neuen Lehrplans (optional)"
+                       style="width:100%; padding:10px 12px; border:1px solid #dbdbdb; border-radius:10px; margin-bottom:14px; box-sizing:border-box; font-size:14px;" />
+            </div>
+
+            <input type="file" name="LessonPlan" accept=".json" required
+                   style="width:100%; padding:10px 12px; border:1px solid #dbdbdb; border-radius:10px; margin-bottom:14px; box-sizing:border-box; font-size:14px;" />
+            <button type="submit" class="btn primary" style="width:100%;">Importieren</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

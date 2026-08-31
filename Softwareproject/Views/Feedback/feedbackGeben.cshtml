@@ -1,0 +1,76 @@
+@model Softwareproject.Models.Feedback
+@{
+    Layout = null;
+    ViewData["Title"] = "Feedback geben";
+    bool isEdit = Model != null && Model.Id > 0;
+}
+<link rel="stylesheet" href="~/css/feedbackGeben.css"/>
+<div class="feedback-container">
+    <div class="feedback-card">
+            <h1>Feedback zur Lektion</h1>
+        <form asp-controller="Feedback" asp-action="@(isEdit ? (ViewBag.IsMentorFeedback == true ? "EditMentorFeedback" : "EditFeedback") : (ViewBag.IsMentorFeedback == true ? "CreateMentorFeedback" : "CreateFeedback"))" method="post">
+            <input type="hidden" name="progressId" value="@Context.Request.Query["progressId"]" />
+            @Html.AntiForgeryToken()
+            @if(isEdit){
+                <input asp-for="Id" type="hidden"/>
+            }
+            <div asp-validation-summary="ModelOnly" class="validation-error"></div>
+            <div class="grid">
+                <div class="form-group">
+                    <label asp-for="Difficulty">
+                        Schwierigkeitsgrad
+                    </label>
+
+                    <select asp-for="Difficulty">
+                        <option value="0">Unbekannt</option>
+                        <option value="1">Sehr leicht</option>
+                        <option value="2">Leicht</option>
+                        <option value="3">Mittel</option>
+                        <option value="4">Schwer</option>
+                        <option value="5">Sehr schwer</option>
+                    </select>
+
+                    <span asp-validation-for="Difficulty" class="validation-error"></span>
+            </div>
+                <div class="form-group">
+                    <label asp-for="PriorKnowledge">
+                        Vorkenntnisse
+                    </label>
+                    <input asp-for="PriorKnowledge" placeholder="z.B. Grundkentnisse in HTML">
+                    <span asp-validation-for="PriorKnowledge" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Effort">
+                        Tatsächlicher Aufwand
+                    </label>
+
+                    <input asp-for="Effort" placeholder="z.B. 12 Stunden" />
+                    <span asp-validation-for="Effort" class="validation-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Comment">
+                        Kommentar
+                    </label>
+
+                    <textarea asp-for="Comment" placeholder="Optionales Feedback zur Lektion..."></textarea>
+
+                    <span asp-validation-for="Comment" class="validation-error"></span>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn-primary">
+                        @(isEdit ? "Änderungen speichern" : "Feedback speichern")
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="location.href='@(ViewBag.IsMentorFeedback == true ? Url.Action("TraineeLessonPlan", "LessonPlan", new { traineeId = ViewBag.TraineeId }) : Url.Action("LehrplanUebersicht", "LessonPlan"))'">
+                        Abbrechen
+                    </button>
+                </div>
+
+        </form>
+        
+    </div>
+</div>
+@section Scripts{
+@{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,61 @@
+@model List<Softwareproject.Models.Lesson>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lehrplanübersicht</title>
+    <link rel="stylesheet" href="~/css/lehrplan.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+
+    <a class="back-link" asp-controller="LessonPlan" asp-action="Verwaltung">← Zur Übersicht</a>
+
+    <h1>Lektionen</h1>
+
+    @if (!Model.Any())
+    {
+        <p style="color:#626262;">Keine aktiven Lektionen in diesem Lehrplan.</p>
+    }
+
+    <div class="lesson-container">
+        @foreach (var lesson in Model)
+        {
+            <div class="lesson-card">
+                <h3>@lesson.Title</h3>
+
+                <p>
+                    Richtaufwand:
+                    <span class="badge">@(lesson.EstimatedDays?.ToString("0.##") ?? "–") PT</span>
+                </p>
+
+                <div style="margin-top:1rem;">
+                    <a href="@lesson.URL" class="btn primary" target="_blank">Karten-Link öffnen ↗</a>
+                </div>
+            </div>
+        }
+    </div>
+
+</body>
+
+</html>

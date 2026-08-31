@@ -1,0 +1,45 @@
+@model List<Softwareproject.Models.Mentor>
+
+@{
+    Layout = null;
+}
+
+<link rel="stylesheet" href="~/css/navbar.css" />
+<link rel="stylesheet" href="~/css/mentor.css" />
+
+<partial name="_TraineeNavbar" />
+
+<div class="page-content">   
+    <h1>Meine Mentoren</h1>
+
+    <div class="grid">
+
+        @foreach (var mentor in Model)
+        {
+            <div class="mentor-card">
+
+                <div class="avatar">
+                    @(mentor.Name.Length >= 2
+                        ? mentor.Name.Substring(0, 2).ToUpper()
+                        : mentor.Name.ToUpper())
+                </div>
+
+                <div class="name">
+                    @mentor.Name
+                </div>
+
+                <div class="role">
+                    Mentor
+                </div>
+
+                <div class="actions">
+                    <button class="btn primary">
+                        Kontakt
+                    </button>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>

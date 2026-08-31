@@ -1,0 +1,35 @@
+<link
+href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+rel="stylesheet">
+<nav class="navbar">
+    <div class="navbar-left">
+        <img asp-append-version="true" class="navbar-logo" src="~/images/trainee-tracker-logo.svg" alt="Trainee Tracker Logo" />
+
+        <span class="navbar-title">
+            Teaching Platform
+        </span>
+    </div>
+
+    <div class="navbar-links">
+        <a asp-controller="Mentor" asp-action="Trainees">
+            Trainees
+        </a>
+        <a asp-controller="LessonPlan" asp-action="Verwaltung">
+            Lehrpläne
+        </a>
+        <a asp-controller="Request" asp-action="Index">
+            Anträge
+        </a>
+        <a asp-controller="Feedback" asp-action="neuesFeedbackUebersicht">
+            Feedback
+        </a>
+    </div>
+
+    <div class="navbar-user">
+        <span>@User.Identity?.Name</span>
+
+        <a asp-controller="Login" asp-action="Logout">
+            Logout
+        </a>
+    </div>
+</nav>

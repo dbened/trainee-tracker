@@ -1,0 +1,4 @@
+[
+    { "id": 90001, "title": "E2E Test Lektion 1", "url": "https://example.com/e2e-1", "estimate": 1.0, "deprecated": false },
+    { "id": 90002, "title": "E2E Test Lektion 2", "url": "https://example.com/e2e-2", "estimate": 2.0, "deprecated": false }
+]

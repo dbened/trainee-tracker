@@ -1,0 +1,254 @@
+@using Softwareproject.Models
+@model RequestInboxViewModel
+
+@{
+    Layout = null;
+    var trainee = ViewBag.Trainee as Trainee;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anträge</title>
+
+    <link rel="stylesheet" href="~/css/antraege.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700&family=Open+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <partial name="_MentorTraineeNavbar" />
+
+    <div class="antraege-page">
+
+    <a asp-controller="Mentor" asp-action="Trainees" class="back-link">
+        ← Zur Trainee-Übersicht
+    </a>
+
+    <h1>Anträge von @trainee?.Name</h1>
+
+    @if (!Model.OpenBreaks.Any() && !Model.OpenLessons.Any())
+    {
+        <p>Keine offenen Anträge vorhanden.</p>
+    }
+
+    @* ABSCHNITT 1: BREAK-ANTRÄGE *@
+    @if (Model.OpenBreaks.Any())
+    {
+        <h2>Urlaubs-/Pausenanträge</h2>
+
+        @foreach (var breakItem in Model.OpenBreaks)
+        {
+            <div class="card">
+
+                        <p class="card-text">
+                            Zeitraum: @breakItem.StartingDate.ToString("dd.MM.yyyy")
+                            &ndash; @breakItem.EndDate.ToString("dd.MM.yyyy")
+                        </p>
+
+                <p>@breakItem.Description</p>
+
+                <div class="actions">
+
+                    @* Annehmen: setzt Accepted = true *@
+                    <form class="js-confirm" asp-controller="Request" asp-action="AcceptBreak" method="post"
+                          data-title="Antrag annehmen"
+                          data-message="Antrag von @breakItem.Trainee?.Name wirklich annehmen?"
+                          data-confirm-label="Annehmen" data-confirm-style="accept">
+                        <input type="hidden" name="id" value="@breakItem.Id" />
+                        <input type="hidden" name="traineeId" value="@trainee?.Id" />
+                        <button type="submit" class="btn accept">Annehmen</button>
+                    </form>
+
+                    @* Ablehnen: löscht den Request *@
+                    <form class="js-confirm" asp-controller="Request" asp-action="DenyBreak" method="post"
+                          data-title="Antrag ablehnen"
+                          data-message="Antrag von @breakItem.Trainee?.Name wirklich ablehnen?"
+                          data-confirm-label="Ablehnen" data-confirm-style="reject">
+                        <input type="hidden" name="id" value="@breakItem.Id" />
+                        <input type="hidden" name="traineeId" value="@trainee?.Id" />
+                        <button type="submit" class="btn reject">Ablehnen</button>
+                    </form>
+
+                </div>
+
+            </div>
+        }
+    }
+
+    @* ABSCHNITT 2: LESSON-ANTRÄGE (FINISHED → ACCEPTED / REJECTED) *@
+    @if (Model.OpenLessons.Any())
+    {
+        <h2>Abgegebene Lektionen</h2>
+
+        @foreach (var progress in Model.OpenLessons)
+        {
+            <div class="card">
+
+                <p>Lektion: @progress.Lesson?.Title</p>
+
+                <div class="actions">
+
+                    @* Annehmen: FINISHED → ACCEPTED *@
+                    <form class="js-confirm" asp-controller="Request" asp-action="AcceptLesson" method="post"
+                          data-title="Lektion annehmen"
+                          data-message="Lektion „@progress.Lesson?.Title“ von @progress.Trainee?.Name wirklich annehmen?"
+                          data-confirm-label="Annehmen" data-confirm-style="accept">
+                        <input type="hidden" name="progressId" value="@progress.Id" />
+                        <input type="hidden" name="traineeId" value="@trainee?.Id" />
+                        <button type="submit" class="btn accept">Annehmen</button>
+                    </form>
+
+                    @* Ablehnen: FINISHED → REJECTED mit Ablehnungsgrund (Pflichtfeld im Modal) *@
+                    <form class="js-confirm" asp-controller="Request" asp-action="DenyLesson" method="post"
+                          data-title="Lektion ablehnen"
+                          data-message="Lektion „@progress.Lesson?.Title“ von @progress.Trainee?.Name ablehnen. Bitte einen Ablehnungsgrund angeben:"
+                          data-confirm-label="Ablehnen" data-confirm-style="reject"
+                          data-needs-reason="true">
+                        <input type="hidden" name="progressId" value="@progress.Id" />
+                        <input type="hidden" name="refusalReason" value="" />
+                        <input type="hidden" name="traineeId" value="@trainee?.Id" />
+                        <button type="submit" class="btn reject">Ablehnen</button>
+                    </form>
+
+                </div>
+
+            </div>
+        }
+    }
+
+    </div>
+
+    @* =========================
+       BESTÄTIGUNGS-MODAL (im Website-Stil)
+    ========================= *@
+    <div class="modal-overlay" id="confirmModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-message" id="modalMessage"></p>
+
+            <div class="modal-reason" id="modalReason" hidden>
+                <textarea id="modalReasonInput" rows="3"
+                          placeholder="Ablehnungsgrund (Pflichtfeld)"></textarea>
+                <p class="modal-error" id="modalError" hidden>Bitte einen Ablehnungsgrund angeben.</p>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn cancel" id="modalCancel">Abbrechen</button>
+                <button type="button" class="btn" id="modalConfirm">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var overlay = document.getElementById("confirmModal");
+            var titleEl = document.getElementById("modalTitle");
+            var messageEl = document.getElementById("modalMessage");
+            var reasonWrap = document.getElementById("modalReason");
+            var reasonInput = document.getElementById("modalReasonInput");
+            var errorEl = document.getElementById("modalError");
+            var cancelBtn = document.getElementById("modalCancel");
+            var confirmBtn = document.getElementById("modalConfirm");
+
+            var pendingForm = null;
+            var needsReason = false;
+
+            function openModal(form) {
+                pendingForm = form;
+                needsReason = form.dataset.needsReason === "true";
+
+                titleEl.textContent = form.dataset.title || "Bestätigen";
+                messageEl.textContent = form.dataset.message || "";
+
+                // Bestätigen-Button passend einfärben (accept / reject)
+                confirmBtn.className = "btn " + (form.dataset.confirmStyle || "accept");
+                confirmBtn.textContent = form.dataset.confirmLabel || "Bestätigen";
+
+                // Ablehnungsgrund-Feld nur bei Bedarf zeigen
+                reasonWrap.hidden = !needsReason;
+                errorEl.hidden = true;
+                reasonInput.value = "";
+
+                overlay.classList.add("open");
+                overlay.setAttribute("aria-hidden", "false");
+
+                if (needsReason) {
+                    reasonInput.focus();
+                } else {
+                    confirmBtn.focus();
+                }
+            }
+
+            function closeModal() {
+                overlay.classList.remove("open");
+                overlay.setAttribute("aria-hidden", "true");
+                pendingForm = null;
+                needsReason = false;
+            }
+
+            // Alle Aktions-Formulare abfangen
+            document.querySelectorAll("form.js-confirm").forEach(function (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    openModal(form);
+                });
+            });
+
+            confirmBtn.addEventListener("click", function () {
+                if (!pendingForm) return;
+
+                if (needsReason) {
+                    var reason = reasonInput.value.trim();
+                    if (reason === "") {
+                        errorEl.hidden = false;
+                        reasonInput.focus();
+                        return;
+                    }
+                    var hidden = pendingForm.querySelector('input[name="refusalReason"]');
+                    if (hidden) {
+                        hidden.value = reason;
+                    }
+                }
+
+                var form = pendingForm;
+                // Interception umgehen und tatsächlich absenden
+                closeModal();
+                form.submit();
+            });
+
+            cancelBtn.addEventListener("click", closeModal);
+
+            // Klick auf den abgedunkelten Hintergrund schließt das Modal
+            overlay.addEventListener("click", function (e) {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+
+            // Escape schließt das Modal
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && overlay.classList.contains("open")) {
+                    closeModal();
+                }
+            });
+
+            // Tippen entfernt eine ggf. angezeigte Fehlermeldung
+            reasonInput.addEventListener("input", function () {
+                if (reasonInput.value.trim() !== "") {
+                    errorEl.hidden = true;
+                }
+            });
+        })();
+    </script>
+
+</body>
+
+</html>

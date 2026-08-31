@@ -1,0 +1,128 @@
+@model Softwareproject.Models.WeekPlanViewModel
+
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Wochenplan</title>
+
+    <link rel="stylesheet" href="~/css/wochenplan.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700&family=Open+Sans:wght@300;400;600;700&display=swap"
+        rel="stylesheet" 
+    />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorTraineeNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <div class="page-content">
+        <!-- BACK BUTTON -->
+        <a asp-controller="Mentor" asp-action="Trainees" class="back-link">
+            ← Zur Trainee-Übersicht
+        </a>
+        
+        <h1>Wochenplan</h1>
+
+        @if (ViewBag.ApiError == true)
+        {
+            <div class="api-warning">
+                <strong>Hinweis:</strong> Das Zeiterfassungssystem ist momentan nicht erreichbar. Die Projektion basiert auf Standard-Arbeitszeiten (8h/Tag).
+            </div>
+        }
+
+        <div style="margin-top: 24px;">
+            <a asp-controller="WeekPlan" asp-action="CreateBreakForTrainee" asp-route-traineeId="@ViewBag.Trainee.Id" class="button">Urlaub erstellen</a>
+        </div>
+
+        <div class="week-navigation">    
+ 
+            <a asp-action="TraineeWeekPlan" asp-route-traineeId="@ViewBag.Trainee.Id" asp-route-offset="@(Model.Offset - 1)" class="button" 
+                style="@(Model.StartOfWeek.AddDays(-7 + 4) < Model.TraineeStartDate && Model.Offset <= 0 ? "visibility: hidden;" : "")">
+                &laquo;
+            </a>
+            
+            <span style="font-size: 1.1em; font-weight: bold;">
+                Woche vom @Model.StartOfWeek.ToString("dd.MM.yyyy") bis @Model.StartOfWeek.AddDays(4).ToString("dd.MM.yyyy")
+            </span>     
+
+            <a asp-action="TraineeWeekPlan" asp-route-traineeId="@ViewBag.Trainee.Id" asp-route-offset="@(Model.Offset + 1)" class="button" 
+                style="@(Model.StartOfWeek.AddDays(7) > Model.TraineeEndDate && Model.Offset >= 0 ? "visibility: hidden;" : "")">
+                &raquo;
+            </a>
+            
+            @if(Model.Offset != 0)
+            {
+                <a asp-action="TraineeWeekPlan" asp-route-traineeId="@ViewBag.Trainee.Id" asp-route-offset="0" class="button">
+                    Aktuelle Woche
+                </a>
+            }
+        </div>
+
+        @* Sicherheitshalber prüfen wir, ob wir überhaupt Daten vom Server bekommen haben *@
+        @if (Model != null && Model.Days.Any())
+        {
+            <div class="calendar">
+                @foreach (var day in Model.Days)
+                {            
+                    var isToday = day.Date.Date == DateTime.Today;
+
+                    <div class="day-column @(day.IsDayOff ? "day-off" : "") @(isToday ? "today-highlight" : "") ">
+                        <div class="day-header">@day.DayName (@day.Date.ToString("dd.MM."))</div>
+                    
+                        @if (day.IsDayOff)
+                        {
+                            <div class="day-off-indicator">Abwesend</div>
+                        }
+                        else
+                        {
+                            @foreach (var progress in day.Lessons)
+                            {
+                                @* <div class="task" style="min-height:@(Math.Max(60, (progress.Lesson?.EstimatedDays ?? 1) * 40))px;"> *@
+                                <div class="task">              
+                                    <div class="task-title">@progress.Lesson?.Title</div>
+                                    
+                                    @if (day.Date.Date < DateTime.Today.Date)
+                                    {
+                                        @* Historie der Lektionen *@
+                                        <div class="task-desc">Status erreicht: @progress.Status</div>
+                                    }
+                                    else 
+                                    {
+                                        @* Projektion der Lektionen *@
+                                        <div class="task-desc">Status: @progress.Status</div>
+                                        <div class="task-time">Aufwand: @(progress.Lesson?.EstimatedDays ?? 0) Tage</div>
+                                    }
+                                </div>
+                            }        
+                        }        
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</body>
+
+</html>

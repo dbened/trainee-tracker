@@ -1,0 +1,78 @@
+@model Softwareproject.Models.Mentor
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="~/css/adminCreate.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <div class="form-container">
+
+        <div class="form-card">
+
+            <h2 class="form-title">
+                Mentor hinzufügen
+            </h2>
+
+            <form asp-action="MentorCreate" method="post">
+
+                <div class="form-group">
+                    <label asp-for="Name"></label>
+                    <input asp-for="Name" class="form-input" />
+                    <span asp-validation-for="Name" class="validation-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="EmailAddress"></label>
+                    <input asp-for="EmailAddress" class="form-input" />
+                    <span asp-validation-for="EmailAddress" class="validation-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Passwort</label>
+                    <input type="password" name="password" class="form-input" />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">
+                        Speichern
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

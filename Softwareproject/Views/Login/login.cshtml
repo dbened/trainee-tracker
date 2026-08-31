@@ -1,0 +1,87 @@
+@model Softwareproject.Models.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <link rel="stylesheet" href="~/css/login.css" />
+</head>
+
+<body>
+    <div class="login-card">
+
+        <img class="logo" src="~/images/trainee-tracker-logo.svg" alt="Logo" />
+
+        <h1>Login</h1>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div style="color:red; margin-bottom:12px;">
+                @Model.ErrorMessage
+            </div>
+        }
+        @if (TempData["Message"] != null)
+        {
+            <div style="color:green; margin-bottom:12px;">
+                @TempData["Message"]
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+
+            <input asp-for="Email" class="input" placeholder="E-Mail" />
+
+            <span asp-validation-for="Email"></span>
+
+            <input asp-for="Password" class="input" type="password" placeholder="Passwort" />
+
+            <span asp-validation-for="Password"></span>
+
+            <button class="button" type="submit">
+                Anmelden
+            </button>
+
+        </form>
+
+        <div class="links">
+            <a href="#" onclick="forgotPassword(); return false;">
+                Passwort vergessen?
+            </a>
+        </div>
+
+        <form id="forgotPasswordForm" asp-action="ForgotPassword" method="post" style="display:none;">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" id="forgotEmail" name="email" />
+
+        </form>
+
+        <script>
+                    // Opens a dialog where the user can enter their email address
+                    // for a password reset request.
+                    function forgotPassword() {
+                        // Display a browser prompt asking for the user's email.
+                        const email = prompt("Bitte geben Sie Ihre E-Mail-Adresse ein:");
+                        // If the user cancels the prompt or leaves the input empty,
+                        // stop the function without submitting the form.
+                        if (email === null || email.trim() === "")
+                            return;
+                        // Store the entered email
+                        document.getElementById("forgotEmail").value = email;
+                        // Submit the form, sending the email to the ForgotPassword action in the LoginController.
+                        document.getElementById("forgotPasswordForm").submit();
+                    }
+        </script>
+
+    </div>
+</body>
+
+</html>

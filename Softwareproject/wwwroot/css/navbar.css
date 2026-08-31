@@ -1,0 +1,109 @@
+.navbar {
+  height: 72px;
+  background: #141210;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 32px;
+  margin-bottom: 32px;
+
+  box-sizing: border-box;
+
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, #ff0844, #ffb199) 1;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-logo {
+  height: 36px;
+}
+
+.navbar-title {
+  color: white;
+  font-family: "League Spartan", sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 24px;
+}
+
+.navbar-links a {
+  position: relative;
+  padding-bottom: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-links a:hover {
+  color: #ffb199;
+  transform: translateY(-1px);
+}
+
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+  transition: width 0.2s ease;
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
+/* FIXED: works for both <button> and <a> */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: white;
+}
+
+.navbar-user a,
+.navbar-user button {
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.2s ease;
+}
+
+.navbar-user a:hover,
+.navbar-user button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.navbar-links a {
+    position: relative;
+    padding-bottom: 6px;
+    color: white;
+    text-decoration: none;
+    font-family: "Open Sans", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    transition: color 0.2s ease, transform 0.2s ease;
+}

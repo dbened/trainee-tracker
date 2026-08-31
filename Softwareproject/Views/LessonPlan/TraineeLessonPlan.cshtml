@@ -1,0 +1,315 @@
+@model IEnumerable<TraineeLessonProgress>
+
+@{
+    Layout = null;
+    var trainee = ViewBag.Trainee as Softwareproject.Models.Trainee;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lehrplan</title>
+
+    <link rel="stylesheet" href="~/css/lehrplan.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<script src="~/js/scrollPosition.js"></script>
+
+<body>
+
+   
+  
+
+    <partial name="_MentorTraineeNavbar" />
+
+    
+    <div class="page-content">
+        <main class="ruck">
+            <a asp-controller="Mentor" asp-action="Trainees" class="back-link">
+                ← Zur Trainee-Übersicht
+            </a>
+
+            <h1>Lehrplan von @trainee?.Name</h1>
+
+            @if (!Model.Any())
+            {
+                <p style="color:#626262;">
+                    Noch keine Lektionen vorhanden.
+                </p>
+            }
+
+            <div class="lesson-container">
+
+                @{
+                    @* 
+            // Model ist bereits sortiert (nach Status, dann Order). Über den Index lassen sich die
+            // Grenzen einer Statusgruppe erkennen, damit die Auf/Ab-Pfeile nur innerhalb derselben
+            // Statusgruppe angeboten werden – die oberste Lesson einer Gruppe hat keinen Hoch-Pfeil,
+            // die unterste keinen Runter-Pfeil.*@
+                    var items = Model.ToList();
+                }
+
+                @for (int i = 0; i < items.Count; i++)
+                {
+                    var progress = items[i];
+
+                    var isFirstInGroup = i == 0 || items[i - 1].Status != progress.Status;
+                    var isLastInGroup = i == items.Count - 1 || items[i + 1].Status != progress.Status;
+
+                    <div class="lesson-card">
+                        <h3>@progress.Lesson.Title</h3>
+
+                        <p>
+                            Richtaufwand:
+                            <span class="badge">
+                                @(progress.Lesson.EstimatedDays?.ToString("0.##") ?? "–") PT
+                            </span>
+                        </p>
+
+                        <a asp-controller="Feedback" asp-action="FeedbackUebersicht"
+                           asp-route-lessonId="@progress.Lesson.Id">
+                            Feedback
+                        </a>
+
+                        <p>
+                            Status:
+                            <strong>
+
+                                @switch (progress.Status)
+                                {
+                                    case Status.OPEN:
+                                        <text>Offen</text>
+                                        break;
+
+                                    case Status.STARTED:
+                                        <text>In Bearbeitung</text>
+                                        break;
+
+                                    case Status.FINISHED:
+                                        <text>Abgegeben</text>
+                                        break;
+
+                                    case Status.ACCEPTED:
+                                        <text>Akzeptiert</text>
+                                        break;
+
+                                    case Status.REJECTED:
+                                        <text>Abgelehnt</text>
+                                        break;
+
+                                    case Status.SKIPPED:
+                                        <text>Übersprungen</text>
+                                        break;
+
+                                    case Status.RATED:
+                                        <text>Bewertet</text>
+                                        break;
+                                }
+
+                            </strong>
+                        </p>
+
+                        @if (progress.Status == Status.REJECTED &&
+                             !string.IsNullOrEmpty(progress.RefusalReason))
+                        {
+                            <p style="color:#ff0844;
+                                background:#fff0f3;
+                                border-radius:8px;
+                                padding:8px 12px;">
+
+                                <strong>Ablehnungsgrund:</strong>
+
+                                @progress.RefusalReason
+
+                            </p>
+                        }
+
+                        <div style="display:flex;
+                            flex-wrap:wrap;
+                            gap:8px;
+                            margin-top:0.5rem;">
+
+                            @if (progress.Status == Status.OPEN)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="StartLesson" method="post">
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn primary">
+                                        Starten
+                                    </button>
+
+                                </form>
+
+                                <form asp-controller="LessonPlan" asp-action="SkipLesson" method="post">
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn secondary">
+                                        Überspringen
+                                    </button>
+
+                                </form>
+                            }
+
+                            @if (progress.Status == Status.STARTED)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="SubmitLesson" method="post">
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn primary">
+                                        Abgeben
+                                    </button>
+
+                                </form>
+
+                                <form asp-controller="LessonPlan" asp-action="StopLesson" method="post">
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn secondary">
+                                        Stoppen
+                                    </button>
+
+                                </form>
+                            }
+
+                            @if (progress.Status == Status.FINISHED)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="UnfinishLesson" method="post">
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+                                    <button type="submit" class="btn primary">Zurückziehen</button>
+                                </form>
+                            }
+
+                            @if (progress.Status == Status.REJECTED)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="ResubmitLesson" method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn primary">
+                                        Überarbeitung abgeben
+                                    </button>
+
+                                </form>
+                            }
+
+                            @if (progress.Status == Status.SKIPPED)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="UnskipLesson" method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn secondary">
+                                        Wieder aktivieren
+                                    </button>
+
+                                </form>
+                            }
+
+                            @if (progress.Status == Status.ACCEPTED)
+                            {
+                                <form asp-controller="LessonPlan" asp-action="UnacceptLesson" method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden" name="progressId" value="@progress.Id" />
+
+                                    <button type="submit" class="btn secondary">
+                                        Akzeptanz zurücknehmen
+                                    </button>
+
+                                </form>
+                            }
+
+
+                            @if (progress.Status == Status.ACCEPTED)
+                            {
+                                <a asp-controller="Feedback" asp-action="CreateMentorFeedback"
+                                   asp-route-progressId="@progress.Id">Feedback
+                                    geben</a>
+                                }
+
+                                
+                                @if (progress.Status == Status.RATED)
+                                    {
+                                        var feedback = progress.Lesson.FeedbackList.FirstOrDefault(f => f.Trainee != null && f.Trainee.Id == progress.Trainee.Id);
+                                        if (feedback != null)
+                                        {
+                                            <div class="plan-actions">
+                                            <a asp-controller="Feedback" asp-action="EditMentorFeedback" asp-route-id="@feedback.Id" asp-route-progressId="@progress.Id">
+                                            Feedback Ändern
+                                            </a>
+                                                <form asp-controller="Feedback" asp-action="DeleteMentorFeedback" method="post" style="display: inline">
+                                                <input type="hidden" name="id" value="@feedback.Id" />
+                                                <input type="hidden" name="progressId" value="@progress.Id" />
+                                                
+                                                    <button type="submit" class="btn primary" onclick="return confirm('Feedback wirklich löschen?')">
+                                                    Feedback löschen
+                                                    </button>
+                                                    
+                                                </form>
+                                            </div>
+                                        }
+                                    }    
+
+
+                        </div>
+
+                        <div style="margin-top:1rem;">
+
+                            <a href="@progress.Lesson.URL" class="btn primary" target="_blank">
+                                Karten-Link öffnen ↗
+                            </a>
+
+                        </div>
+
+                        <p></p>
+                        @if (!isFirstInGroup || !isLastInGroup)
+                        {
+                            <div style="display:flex; gap:6px; margin-bottom:0.5rem;">
+                                @if (!isFirstInGroup)
+                                {
+                                    <form asp-controller="LessonPlan" asp-action="MoveLessonUp" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="progressId" value="@progress.Id" />
+                                        <button type="submit" class="btn secondary"
+                                                title="Innerhalb des Status nach oben">↑</button>
+                                    </form>
+                                }
+                                @if (!isLastInGroup)
+                                {
+                                    <form asp-controller="LessonPlan" asp-action="MoveLessonDown" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="progressId" value="@progress.Id" />
+                                        <button type="submit" class="btn secondary"
+                                                title="Innerhalb des Status nach unten">↓</button>
+                                    </form>
+                                }
+                            </div>
+                        }
+
+                    </div>
+                }
+
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

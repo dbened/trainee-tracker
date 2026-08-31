@@ -1,0 +1,11 @@
+bin/
+obj/
+node_modules/
+wwwroot/node_modules/
+*.log
+*.db
+*.db-shm
+*.db-wal
+**/.DS_Store
+persistence/
+Tutorial_Project/

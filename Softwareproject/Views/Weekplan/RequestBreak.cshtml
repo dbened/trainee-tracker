@@ -1,0 +1,80 @@
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Urlaub beantragen</title>
+
+    <link rel="stylesheet" href="~/css/wochenplan.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="~/css/requestBreak.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <div class="form-container">
+        <h2>Urlaub beantragen</h2>
+        
+        <p style="color: #666; margin-bottom: 20px;">
+            Dein Mentor muss diesen Antrag genehmigen, bevor er sich auf deinen Wochenplan auswirkt.
+        </p>
+
+        <form asp-controller="WeekPlan" asp-action="CreateBreak" method="post">
+            
+            @* Zeigt allgemeine Formularfehler an *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label for="startDate">Startdatum</label>
+                <input id="startDate" name="startDate" type="date" required />
+                @Html.ValidationMessage("startDate", "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">Enddatum</label>
+                <input id="endDate" name="endDate" type="date" required />
+                @Html.ValidationMessage("endDate", "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="description">Begründung</label>
+                <textarea id="description" name="description"rows="5" placeholder="z. B. Krankheit, Artztermin ..." required ></textarea>
+                @Html.ValidationMessage("description", "", new { @class = "text-danger" })
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                <a asp-controller="WeekPlan" asp-action="Index" class="btn-secondary">
+                    Abbrechen
+                </a>
+                
+                <button type="submit" class="button">
+                    Antrag einreichen
+                </button>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

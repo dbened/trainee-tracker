@@ -1,0 +1,106 @@
+@model List<Softwareproject.Models.Trainee>
+
+@{
+    Layout = null;
+    var lessonPlans = ViewBag.LessonPlans as IEnumerable<Softwareproject.Models.LessonPlan>;
+    var mentors = ViewBag.Mentors as IEnumerable<Softwareproject.Models.Mentor>;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Traineeverwaltung</title>
+
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorNavbar" />
+    }
+    else if (User.IsInRole("Trainee"))
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <p></p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="error-message">@TempData["Error"]</div>
+    }
+
+
+    <div class="page-content">
+    <main class="ruck">
+    <a asp-action="TraineeCreate" class="plan-button">
+        Trainee hinzufügen
+    </a>
+
+    <p></p>
+
+    <div class="grid">
+
+        @foreach (var trainee in Model)
+        {
+            <div class="mentor-card">
+
+                <div class="avatar">
+                    @trainee.Name.Substring(0, 2).ToUpper()
+                </div>
+
+                <div class="name">
+                    @trainee.Name
+                </div>
+
+                <div class="role">
+                    Trainee
+                </div>
+
+                <div class="actions">
+
+                    <!-- ROW 1: CORE ACTIONS -->
+                    <div class="action-row">
+
+                        <a asp-action="TraineeEdit" asp-route-id="@trainee.Id" class="btn primary">
+                            Bearbeiten
+                        </a>
+                        <form asp-action="TraineeDelete" asp-route-id="@trainee.Id" method="post" class="delete-form"
+                              onsubmit="return confirm('⚠️ Trainee löschen?\n\nAlle zugehörigen Daten (Fortschritt, Zuweisungen) können betroffen sein.\n\nWirklich fortfahren?');">
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit" class="btn danger">
+                                Löschen
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+    </div>
+    </main>
+
+</body>
+
+</html>

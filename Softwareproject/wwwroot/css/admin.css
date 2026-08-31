@@ -1,0 +1,335 @@
+body {
+  margin: 0;
+  background: #f5f5f5;
+  font-family: "Open Sans", sans-serif;
+}
+
+/* =========================
+   PAGE WRAPPER (recommended for MVC)
+========================= */
+
+.page {
+  padding: 40px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-family: "League Spartan", sans-serif;
+  color: #141210;
+}
+
+.search {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  width: 260px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.mentor-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  position: relative;
+  overflow: hidden;
+  transition: 0.2s ease;
+}
+
+.mentor-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+}
+
+.mentor-card:hover {
+  transform: translateY(-4px);
+}
+
+/* =========================
+   AVATAR / INFO
+========================= */
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.name {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.role {
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   TAGS
+========================= */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f2f2f2;
+}
+
+/* =========================
+   OFFICE HOURS
+========================= */
+
+.office-hours {
+  margin-bottom: 16px;
+  padding: 12px;
+
+  border-radius: 12px;
+  background: #f6f6f6;
+
+  border: 1px solid #e9e9e9;
+}
+
+.office-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #141210;
+}
+
+.office-time {
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 4px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.error-message {
+  background: #ffe5e5;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actions > a,
+.actions > form {
+  flex: 1;
+}
+
+.actions {
+  align-items: stretch;
+}
+
+.delete-form {
+  margin: 0;
+}
+
+.actions .btn {
+  width: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-decoration: none;
+
+  min-height: 40px;
+}
+.action-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.action-row a,
+.action-row form {
+  flex: 1;
+  display: flex;
+}
+
+.action-row button.btn {
+  width: 100%;
+}
+
+.plan-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 24px;
+
+  border-radius: 14px;
+  text-decoration: none;
+
+  font-weight: 700;
+  font-size: 15px;
+
+  color: white;
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+
+  box-shadow: 0 10px 24px rgba(255, 8, 68, 0.25);
+
+  transition: all 0.2s ease;
+}
+
+.plan-button:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 14px 32px rgba(255, 8, 68, 0.35);
+}
+
+.plan-button:active {
+  transform: translateY(0);
+}
+
+.plan-button::before {
+  content: "+";
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.primary {
+  background: linear-gradient(90deg, #ff0844, #ffb199);
+  color: white;
+}
+
+/* FIXED missing class */
+.danger {
+  background: #ff3b3b;
+  color: white;
+}
+
+.secondary {
+  background: #eee;
+  color: #141210;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .search {
+    width: 100%;
+  }
+}
+.ruck{
+  padding-left: 20px!important;
+}
+
+.back-link {
+    display: inline-block;
+    margin: 12px 0 24px 0;
+
+    color: #141210;
+    text-decoration: none;
+
+    font-weight: 600;
+
+    padding: 10px 14px;
+    border-radius: 10px;
+
+    background: #f2f2f2;
+
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    background: #e9e9e9;
+    transform: translateX(-2px);
+}

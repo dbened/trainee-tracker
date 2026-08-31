@@ -1,0 +1,176 @@
+@model Softwareproject.Models.Statistic
+
+@{
+    Layout = null;
+
+    var trainee = ViewBag.Trainee as Softwareproject.Models.Trainee;
+    bool canRefresh = ViewBag.CanRefresh ?? false;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Statistik</title>
+
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+</head>
+
+<body>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminNavbar" />
+    }
+    else if (User.IsInRole("Mentor"))
+    {
+        <partial name="_MentorTraineeNavbar" />
+    }
+    else
+    {
+        <partial name="_TraineeNavbar" />
+    }
+
+    <div class="page">
+
+        @if (User.IsInRole("Mentor") || User.IsInRole("Admin"))
+        {
+            <a asp-controller="Mentor" asp-action="Trainees" class="back-link">
+                ← Zur Trainee-Übersicht
+            </a>
+        }
+
+        <h1>Statistik</h1>
+
+        @if (trainee != null)
+        {
+            <h2>@trainee.Name</h2>
+        }
+
+        @if (Model != null && !Model.WorkingHoursAvailable)
+        {
+            <div style="
+                background:#ffe6e6;
+                border:2px solid red;
+                color:#b00000;
+                padding:15px;
+                margin:20px 0;
+                border-radius:6px;
+                font-weight:bold;">
+                ⚠ Verbindung zur API fehlgeschlagen.
+                Die zuletzt verfügbaren Statistiken werden angezeigt, falls vorhanden.
+            </div>
+        }
+
+        @if (Model == null)
+        {
+            <div class="mentor-card">
+                <h2>Noch keine Statistik vorhanden. Wende dich an deinen Mentor</h2>
+                <p></p>
+            </div>
+        }
+        else
+        {
+            <div class="grid">
+
+                <div class="mentor-card">
+                    <h2>Anwesend</h2>
+                    <div class="name">@Model.PresentDays.ToString("0.0") Tage</div>
+                    <p>Berechnete Anwesenheit in Arbeitstagen seit Beginn der Ausbildung.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Geschafft</h2>
+                    <div class="name">@Model.CompletedDays.ToString("0.0") Tage</div>
+                    <p>Geschätzter Aufwand aller abgeschlossenen Lektionen.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Offen</h2>
+                    <div class="name">@Model.RemainingDays.ToString("0.0") Tage</div>
+                    <p>Noch verbleibender geschätzter Aufwand des Lehrplans.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Puffer</h2>
+
+                    <div class="name" style="color:@(Model.BufferDays >= 0 ? "green" : "red")">
+                        @Model.BufferDays.ToString("0.0") Tage
+                    </div>
+
+                    @if (Model.PresentDays < 15)
+                    {
+                        <p>Noch keine aussagekräftige Messung (unter 15 Personentagen).</p>
+                    }
+                    <p>Positiv = Vorsprung, negativ = Rückstand gegenüber der Anwesenheit.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Geschwindigkeit</h2>
+                    <div class="name">@Model.Speed.ToString("0") %</div>
+                    <p>Verhältnis von erledigtem Aufwand zur bisherigen Anwesenheit.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Puffer-Vorhersage</h2>
+                    <div class="name">@Model.ForecastBufferDays.ToString("0.0") Tage</div>
+                    <p>Erwarteter Puffer zum Ausbildungsende bei gleichbleibender Geschwindigkeit.</p>
+                </div>
+
+                <div class="mentor-card">
+                    <h2>Letzte Aktualisierung</h2>
+
+                    <div class="name">
+                        @Model.LastUpdated.ToString("dd.MM.yyyy HH:mm")
+                    </div>
+                </div>
+
+            </div>
+
+            @if (canRefresh && trainee != null)
+            {
+                <br />
+
+                <form asp-action="Refresh" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="traineeId" value="@trainee.Id" />
+
+                    <button class="btn primary">
+                        Statistik jetzt aktualisieren
+                    </button>
+
+                </form>
+            }
+        }
+        @if (User.IsInRole("Mentor") || User.IsInRole("Admin"))
+        {
+            <form asp-action="Refresh" method="post" style="margin-top:30px;">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="traineeId" value="@ViewBag.Trainee.Id" />
+
+                <button type="submit" class="btn primary">
+                    Statistik aktualisieren
+                </button>
+
+            </form>
+        }
+
+    </div>
+
+</body>
+
+</html>

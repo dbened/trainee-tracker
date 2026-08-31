@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Softwareproject/">
+    <Project Path="Softwareproject/MyApi.csproj" />
+  </Folder>
+  <Project Path="Softwareproject.E2ETests/Softwareproject.E2ETests.csproj" />
+  <Project Path="SoftwareProject.UnitTests/SoftwareProject.UnitTests.csproj" />
+</Solution>

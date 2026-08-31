@@ -1,0 +1,72 @@
+[
+  {
+    "id": 5001,
+    "title": "Start: Development Workflow",
+    "url": "https://example.com/curriculum/5001",
+    "estimate": 0.0,
+    "deprecated": false
+  },
+  {
+    "id": 5002,
+    "title": "Programming Fundamentals",
+    "url": "https://example.com/curriculum/5002",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5003,
+    "title": "Object-Oriented Programming",
+    "url": "https://example.com/curriculum/5003",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5004,
+    "title": "Git and Version Control",
+    "url": "https://example.com/curriculum/5004",
+    "estimate": 1.0,
+    "deprecated": false
+  },
+  {
+    "id": 5005,
+    "title": "Databases and SQL",
+    "url": "https://example.com/curriculum/5005",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5006,
+    "title": "ASP.NET Core Basics",
+    "url": "https://example.com/curriculum/5006",
+    "estimate": 3.0,
+    "deprecated": false
+  },
+  {
+    "id": 5007,
+    "title": "MVC Architecture",
+    "url": "https://example.com/curriculum/5007",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5008,
+    "title": "Automated Testing",
+    "url": "https://example.com/curriculum/5008",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5009,
+    "title": "REST APIs",
+    "url": "https://example.com/curriculum/5009",
+    "estimate": 2.0,
+    "deprecated": false
+  },
+  {
+    "id": 5010,
+    "title": "Clean Code and Refactoring",
+    "url": "https://example.com/curriculum/5010",
+    "estimate": 2.0,
+    "deprecated": false
+  }
+]

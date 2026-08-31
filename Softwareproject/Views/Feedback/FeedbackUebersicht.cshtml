@@ -1,0 +1,82 @@
+@model IEnumerable<FeedbackViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback Übersicht</title>
+
+    <link rel="stylesheet" href="~/css/feedbackUebersicht.css" />
+</head>
+
+<body>
+
+    <div class="feedback-container">
+
+        <div class="feedback-header">
+            <h1>Neueste Feedback-Einträge</h1>
+            <p class="subtitle">Alle Rückmeldungen der Teilnehmer im Überblick</p>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <p class="empty">Keine Feedback-Einträge vorhanden.</p>
+        }
+        else
+        {
+            <div class="feedback-list">
+
+                @foreach (var feedback in Model)
+                {
+                    <div class="feedback-item">
+
+                        <div class="feedback-top">
+                            <strong>@feedback.Trainee?.Name</strong>
+                            <span class="lesson">@feedback.Lesson?.Title</span>
+                        </div>
+
+                        <p class="comment">
+                            @feedback.Comment
+                        </p>
+
+                        <div class="meta">
+
+                            <span>
+                                Schwierigkeit:
+                                <b>
+                                    @(feedback.Difficulty switch
+                                    {
+                                        0 => "Unbekannt",
+                                        1 => "Sehr Leicht",
+                                        2 => "Leicht",
+                                        3 => "Mittel",
+                                        4 => "Schwer",
+                                        5 => "Sehr Schwer",
+                                        _ => "Ungültig"
+                                    })
+                                </b>
+                            </span>
+
+                            <span>Aufwand: <b>@feedback.Effort</b></span>
+
+                            <span>Vorkenntnisse: <b>@feedback.PriorKnowledge</b></span>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</body>
+
+</html>

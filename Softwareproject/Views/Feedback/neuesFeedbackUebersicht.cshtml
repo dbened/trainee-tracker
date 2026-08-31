@@ -1,0 +1,100 @@
+@model IEnumerable<FeedbackViewModel>
+
+@{
+    Layout = null;
+
+    var from = Context.Request.Query["from"];
+    var to = Context.Request.Query["to"];
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback Übersicht</title>
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="~/css/feedbackUebersicht.css" />
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+    <partial name="_MentorNavbar" />
+    <div class="feedback-container">
+
+        <div class="feedback-header">
+            <h1>Feedback der letzten 2 Monate</h1>
+            <p class="subtitle">Alle Rückmeldungen der Teilnehmer im Überblick</p>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <p class="empty">Keine Feedback-Einträge vorhanden.</p>
+        }
+        else
+        {
+            <div class="feedback-list">
+
+                @foreach (var feedback in Model)
+                {
+                    <div class="feedback-item">
+
+                        <div class="feedback-top">
+
+                            <div>
+                                <strong>@feedback.Trainee?.Name</strong><br />
+                                <span class="lesson">@feedback.Lesson?.Title</span>
+                            </div>
+                        </div>
+
+                        <p class="comment">
+                            @feedback.Comment
+                        </p>
+
+                        <div class="meta">
+
+                            <span>
+                                Schwierigkeit:
+                                <b>
+                                    @(feedback.Difficulty switch
+                                    {
+                                        0 => "Unbekannt",
+                                        1 => "Sehr Leicht",
+                                        2 => "Leicht",
+                                        3 => "Mittel",
+                                        4 => "Schwer",
+                                        5 => "Sehr Schwer",
+                                        _ => "Ungültig"
+                                    })
+                                </b>
+                            </span>
+
+                            <span>
+                                Aufwand:
+                                <b>@feedback.Effort</b>
+                            </span>
+
+                            <span>
+                                Vorkenntnisse:
+                                <b>@feedback.PriorKnowledge</b>
+                            </span>
+                            <span>Änderungsdatum:
+                                <b>@feedback.SubmitDate</b>
+                            </span>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</body>
+
+</html>

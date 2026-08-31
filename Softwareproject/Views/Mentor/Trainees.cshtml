@@ -1,0 +1,84 @@
+@model List<Softwareproject.Models.Trainee>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trainees</title>
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="~/css/traineeuebersicht.css" />
+    <link
+    href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+    <partial name="_MentorNavbar" />
+
+    <main class="trainee-page">
+        <section class="page-header">
+            <div>
+                <p class="page-eyebrow">Mentor-Übersicht</p>
+                <h1>Trainees</h1>
+                <p class="page-subtitle">Wähle einen aktiven Trainee aus, um den vorhandenen Lehrplan und die
+                    Fortschrittsansicht weiterzuverwenden.</p>
+                </div>
+            </section>
+
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    Keine Trainees vorhanden.
+                </div>
+            }
+            else
+            {
+                <section class="trainee-grid">
+                    @foreach (var trainee in Model)
+                    {
+                        var avatarText = string.IsNullOrWhiteSpace(trainee.Name)
+                            ? "??"
+                            : trainee.Name.Length >= 2
+                                ? trainee.Name.Substring(0, 2).ToUpper()
+                                : trainee.Name.Substring(0, 1).ToUpper();
+
+                        <article class="trainee-card">
+                            <div class="trainee-header">
+                                <div class="avatar">@avatarText</div>
+                                <div>
+                                    <div class="name">@trainee.Name</div>
+                                    <div class="role">Trainee</div>
+                                </div>
+                            </div>
+
+                            <div class="trainee-meta">
+                                <span class="status-badge @(trainee.IsActive ? "status-badge--active" : "status-badge--inactive")">
+                                    @(trainee.IsActive ? "Aktiv" : "Inaktiv")
+                                </span>
+                            </div>
+
+                            <div class="trainee-info">
+                                <p><strong>Name:</strong> @trainee.Name</p>
+                                <p><strong>Status:</strong> @(trainee.IsActive ? "Aktiv" : "Inaktiv")</p>
+                            </div>
+
+                            <div class="actions">
+                                <a asp-controller="LessonPlan" asp-action="TraineeLessonPlan" asp-route-traineeId="@trainee.Id"
+                                   class="btn primary">
+                                    Trainee öffnen
+                                </a>
+                            </div>
+                        </article>
+                    }
+                </section>
+            }
+        </main>
+    </body>
+
+</html>
